@@ -40,6 +40,9 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 					booststrap = sample(obsData$index[cond],sum(cond),replace=T)
 					result = lm(logC~ydecimal+logQ+sin2pit+cos2pit, data=obsData[booststrap,], weights= Tweight[booststrap])
 					# log(obsData$no3) = beta0 + beta1*obsData$ydecimal + beta2*obsData$logQ + beta3*obsData$sin2pit + beta4*obsData$cos2pit
+					# new features coming: visual beta2 A:: {y:Q X:time}; countour beta2 by colors
+					# B:: monthly boxplot of beta2; C::percentile Q boxplot of beta2
+				
 					alpha = sum(exp(result$residuals)*Tweight[booststrap])/sum(Tweight[booststrap])
 					return <- alpha * exp( result$coefficients[1] + sum(result$coefficients[2:5]*predData[i,c('ydecimal','logQ','sin2pit','cos2pit')]) )
 				})#sapply
