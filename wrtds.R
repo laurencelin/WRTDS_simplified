@@ -44,7 +44,11 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 					# B:: monthly boxplot of beta2; C::percentile Q boxplot of beta2
 				
 					alpha = sum(exp(result$residuals)*Tweight[booststrap])/sum(Tweight[booststrap])
-					return <- alpha * exp( result$coefficients[1] + sum(result$coefficients[2:5]*predData[i,c('ydecimal','logQ','sin2pit','cos2pit')]) )
+					return <- c(
+						alpha * exp( result$coefficients[1] + sum(result$coefficients[2:5]*predData[i,c('ydecimal','logQ','sin2pit','cos2pit')]) ),
+						result$coefficients[3], # coefficent for the log(Q)
+						sum(Yweight>0 & Sweight>0 & Qweight>0),
+						summary(result)$r.squared)
 				})#sapply
 		}#ifelse
 	})# sapply
