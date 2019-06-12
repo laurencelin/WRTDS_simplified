@@ -59,9 +59,9 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 	})# sapply
 	# prediction is a matrix: col is daily; row is [1:replication] [1:replication] [1:replication]
 	return <- list(
-		conc = prediction[1:replication,],
-		beta2 = prediction[(1:replication)+replication,],
-		r2 = prediction[(1:replication)+2*replication,])
+		conc = prediction[1:replicationN,],
+		beta2 = prediction[(1:replicationN)+replicationN,],
+		r2 = prediction[(1:replicationN)+2*replicationN,])
 }# function
 
  		
