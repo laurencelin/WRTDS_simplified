@@ -47,6 +47,7 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 					return <- c(
 						alpha * exp( result$coefficients[1] + sum(result$coefficients[2:5]*predData[i,c('ydecimal','logQ','sin2pit','cos2pit')]) ),
 						result$coefficients[3], # coefficent for the log(Q)
+						sum(result$coefficients[4:5]*predData[i,c('sin2pit','cos2pit')]),
 						summary(result)$r.squared)
 				})#sapply: every day and replication
 			# dailyReplication is a matrix: row is return and col is replication
@@ -54,14 +55,15 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 			#row[2] # coefficent beta2
 			#row[3] # r2
 			
-			return <- c(dailyReplication[1,], dailyReplication[2,], dailyReplication[3,])
+			return <- c(dailyReplication[1,], dailyReplication[2,], dailyReplication[3,], dailyReplication[4,])
 		}#ifelse
 	})# sapply
 	# prediction is a matrix: col is daily; row is [1:replication] [1:replication] [1:replication]
 	return <- list(
 		conc = prediction[1:replicationN,],
 		beta2 = prediction[(1:replicationN)+replicationN,],
-		r2 = prediction[(1:replicationN)+2*replicationN,])
+		seasonal = prediction[(1:replicationN)+2*replicationN,],
+		r2 = prediction[(1:replicationN)+3*replicationN,])
 }# function
 
  		
