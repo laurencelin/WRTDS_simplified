@@ -51,18 +51,22 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 						
 							alpha = sum(exp(result$residuals)*Tweight[booststrap])/sum(Tweight[booststrap])
 							predConc = alpha * exp( result$coefficients[1] + sum(result$coefficients[2:5]*predData[i,c('ydecimal','logQ','sin2pit','cos2pit')]) )
-							if(is.infinite(predConc)) print(paste(
-								alpha,
-								result$coefficients[1],
-								result$coefficients[2],
-								result$coefficients[3],
-								result$coefficients[4],
-								result$coefficients[5]));
+							if(is.infinite(predConc)){
+								print(paste(
+									alpha,min(result$residuals),max(result$residuals),
+									result$coefficients[1],
+									result$coefficients[2],
+									result$coefficients[3],
+									result$coefficients[4],
+									result$coefficients[5]));
+								checkresults <- c(NA, NA, NA, NA);
+							}else{
 							checkresults <- c(
 								predConc,
 								result$coefficients[3], # coefficent for the log(Q)
 								sum(result$coefficients[4:5]*predData[i,c('sin2pit','cos2pit')]),
-								summary(result)$r.squared)
+								summary(result)$r.squared);
+							}
 						},warning = function(w){
 						    checkresults <- c(NA, NA, NA, NA)		
 						},error=function(e){
