@@ -94,6 +94,7 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 		beta2 = prediction[(1:replicationN)+replicationN,],
 		seasonal = prediction[(1:replicationN)+2*replicationN,],
 		r2 = prediction[(1:replicationN)+3*replicationN,],
+		NSE = nse,
 		NSEmean = mean(nse),
 		NSEsd = sd(nse))
 }# function
