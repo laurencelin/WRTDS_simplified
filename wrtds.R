@@ -40,7 +40,7 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 					booststrap = rep(1,sum(cond))
 					while( max(table(booststrap))>5 ){
 						booststrap = sample(obsData$index[cond],sum(cond),replace=T)
-					)#while
+					}#while
 					result = lm(logC~ydecimal+logQ+sin2pit+cos2pit, data=obsData[booststrap,], weights= Tweight[booststrap])
 					# log(obsData$no3) = beta0 + beta1*obsData$ydecimal + beta2*obsData$logQ + beta3*obsData$sin2pit + beta4*obsData$cos2pit
 					# new features coming: visual beta2 A:: {y:Q X:time}; countour beta2 by colors
