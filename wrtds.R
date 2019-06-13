@@ -37,29 +37,39 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 			cond = Tweight>0; #sum(cond); sum(Yweight>0); sum(Sweight>0); sum(Qweight>0)
 			
 			dailyReplication <- sapply(seq_len(replicationN), function(gg){
-					booststrap = rep(1,sum(cond))
-					while( max(table(booststrap))>5 ){
-						booststrap = sample(obsData$index[cond],sum(cond),replace=T)
-					}#while
-					result = lm(logC~ydecimal+logQ+sin2pit+cos2pit, data=obsData[booststrap,], weights= Tweight[booststrap])
-					# log(obsData$no3) = beta0 + beta1*obsData$ydecimal + beta2*obsData$logQ + beta3*obsData$sin2pit + beta4*obsData$cos2pit
-					# new features coming: visual beta2 A:: {y:Q X:time}; countour beta2 by colors
-					# B:: monthly boxplot of beta2; C::percentile Q boxplot of beta2
-				
-					alpha = sum(exp(result$residuals)*Tweight[booststrap])/sum(Tweight[booststrap])
-					predConc = alpha * exp( result$coefficients[1] + sum(result$coefficients[2:5]*predData[i,c('ydecimal','logQ','sin2pit','cos2pit')]) )
-					if(is.infinite(predConc)) print(paste(
-						alpha,
-						result$coefficients[1],
-						result$coefficients[2],
-						result$coefficients[3],
-						result$coefficients[4],
-						result$coefficients[5]));
-					return <- c(
-						predConc,
-						result$coefficients[3], # coefficent for the log(Q)
-						sum(result$coefficients[4:5]*predData[i,c('sin2pit','cos2pit')]),
-						summary(result)$r.squared)
+					checkresults = rep(NA,4)
+					while( sum(is.na(checkresults))>0 ){
+						tryCatch({
+							booststrap = rep(1,sum(cond))
+							while( max(table(booststrap))>5 ){
+								booststrap = sample(obsData$index[cond],sum(cond),replace=T)
+							}#while
+							result = lm(logC~ydecimal+logQ+sin2pit+cos2pit, data=obsData[booststrap,], weights= Tweight[booststrap])
+							# log(obsData$no3) = beta0 + beta1*obsData$ydecimal + beta2*obsData$logQ + beta3*obsData$sin2pit + beta4*obsData$cos2pit
+							# new features coming: visual beta2 A:: {y:Q X:time}; countour beta2 by colors
+							# B:: monthly boxplot of beta2; C::percentile Q boxplot of beta2
+						
+							alpha = sum(exp(result$residuals)*Tweight[booststrap])/sum(Tweight[booststrap])
+							predConc = alpha * exp( result$coefficients[1] + sum(result$coefficients[2:5]*predData[i,c('ydecimal','logQ','sin2pit','cos2pit')]) )
+							if(is.infinite(predConc)) print(paste(
+								alpha,
+								result$coefficients[1],
+								result$coefficients[2],
+								result$coefficients[3],
+								result$coefficients[4],
+								result$coefficients[5]));
+							checkresults <- c(
+								predConc,
+								result$coefficients[3], # coefficent for the log(Q)
+								sum(result$coefficients[4:5]*predData[i,c('sin2pit','cos2pit')]),
+								summary(result)$r.squared)
+						},warning = function(w){
+						    checkresults <- c(NA, NA, NA, NA)		
+						},error=function(e){
+						    checkresults <- c(NA, NA, NA, NA)
+						})# tryCatch
+					}#while	
+					return <- checkresults	
 				})#sapply: every day and replication
 			# dailyReplication is a matrix: row is return and col is replication
 			#row[1] # WRTDS prediction
