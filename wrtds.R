@@ -37,15 +37,26 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 			cond = Tweight>0; #sum(cond); sum(Yweight>0); sum(Sweight>0); sum(Qweight>0)
 			
 			dailyReplication <- sapply(seq_len(replicationN), function(gg){
-					booststrap = sample(obsData$index[cond],sum(cond),replace=T)
+					booststrap = rep(1,sum(cond))
+					while( max(table(booststrap))>5 ){
+						booststrap = sample(obsData$index[cond],sum(cond),replace=T)
+					)#while
 					result = lm(logC~ydecimal+logQ+sin2pit+cos2pit, data=obsData[booststrap,], weights= Tweight[booststrap])
 					# log(obsData$no3) = beta0 + beta1*obsData$ydecimal + beta2*obsData$logQ + beta3*obsData$sin2pit + beta4*obsData$cos2pit
 					# new features coming: visual beta2 A:: {y:Q X:time}; countour beta2 by colors
 					# B:: monthly boxplot of beta2; C::percentile Q boxplot of beta2
 				
 					alpha = sum(exp(result$residuals)*Tweight[booststrap])/sum(Tweight[booststrap])
+					predConc = alpha * exp( result$coefficients[1] + sum(result$coefficients[2:5]*predData[i,c('ydecimal','logQ','sin2pit','cos2pit')]) )
+					if(is.infinite(predConc)) print(paste(
+						alpha,
+						result$coefficients[1],
+						result$coefficients[2],
+						result$coefficients[3],
+						result$coefficients[4],
+						result$coefficients[5]));
 					return <- c(
-						alpha * exp( result$coefficients[1] + sum(result$coefficients[2:5]*predData[i,c('ydecimal','logQ','sin2pit','cos2pit')]) ),
+						predConc,
 						result$coefficients[3], # coefficent for the log(Q)
 						sum(result$coefficients[4:5]*predData[i,c('sin2pit','cos2pit')]),
 						summary(result)$r.squared)
@@ -59,11 +70,18 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 		}#ifelse
 	})# sapply
 	# prediction is a matrix: col is daily; row is [1:replication] [1:replication] [1:replication]
+	
+	commonDates = intersectDate(list(obsData$date, predData$date))
+	obs.dtsMatch = match(commonDates, obsData$date)
+	pred.dtsMatch = match(commonDates, predData$date)
+	nse = sapply(1:replicationN,function(ii){ NSE(obsData$C[obs.dtsMatch], prediction[ii,pred.dtsMatch]) })
 	return <- list(
 		conc = prediction[1:replicationN,],
 		beta2 = prediction[(1:replicationN)+replicationN,],
 		seasonal = prediction[(1:replicationN)+2*replicationN,],
-		r2 = prediction[(1:replicationN)+3*replicationN,])
+		r2 = prediction[(1:replicationN)+3*replicationN,],
+		NSEmean = mean(nse),
+		NSEsd = sd(nse))
 }# function
 
  		
