@@ -51,7 +51,7 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 						
 							alpha = sum(exp(result$residuals)*Tweight[booststrap])/sum(Tweight[booststrap])
 							predConc = alpha * exp( result$coefficients[1] + sum(result$coefficients[2:5]*predData[i,c('ydecimal','logQ','sin2pit','cos2pit')]) )
-							if(is.infinite(predConc)){
+							if(is.infinite(predConc) | predConc > 100*max(obsData$C[booststrap]) |  predConc < 0.01 *min(obsData$C[booststrap]) ){
 								print(paste(
 									alpha,min(result$residuals),max(result$residuals),
 									result$coefficients[1],
