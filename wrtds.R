@@ -5,7 +5,7 @@ source('https://raw.githubusercontent.com/laurencelin/Date_analysis/master/LIB_m
 
 WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, Qhalfwin=2){ 
 	
-	prediction <- sapply(seq_len(dim(predData)[1]), function(i){
+	prediction <- sapply(1:20, function(i){ # seq_len(dim(predData)[1])
         
         # every day
 		if(is.na(predData$logQ[i]) ){
@@ -83,16 +83,16 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 			#row[2] # coefficent beta2
 			#row[3] # r2
 			
-            return <- c(dailyReplication[1,], # conc
-                        dailyReplication[2,], # beta2
-                        dailyReplication[3,], # seasonal
-                        dailyReplication[4,], # r2
-                        Yhalfwin_,
-                        Shalfwin_,
-                        Qhalfwin_)
+            return <- c(dailyReplication[1,], # conc 1
+                        dailyReplication[2,], # beta2 2
+                        dailyReplication[3,], # seasonal 3
+                        dailyReplication[4,], # r2 4
+                        Yhalfwin_, #5
+                        Shalfwin_, #6
+                        Qhalfwin_) #7
 		}#ifelse
 	})# sapply
-	# prediction is a matrix: col is daily; row is [1:replication] [1:replication] [1:replication]
+	# prediction is a matrix: col is daily; row is [1:replication] [1:replication] [1:replication] 1 1 1
 	
 	commonDates = intersectDate(list(obsData$date, predData$date))
 	obs.dtsMatch = match(commonDates, obsData$date)
