@@ -5,7 +5,7 @@ source('https://raw.githubusercontent.com/laurencelin/Date_analysis/master/LIB_m
 
 WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, Qhalfwin=2){ 
 	
-	prediction <- sapply(1:20, function(i){ # seq_len(dim(predData)[1])
+	prediction <- sapply(seq_len(dim(predData)[1]), function(i){ # 
         
         # every day
 		if(is.na(predData$logQ[i]) ){
