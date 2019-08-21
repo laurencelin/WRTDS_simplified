@@ -68,9 +68,9 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 								summary(result)$r.squared);
 							}
 						},warning = function(w){
-						    checkresults <- c(NA, NA, NA, NA)		
+						    checkresults <- c(NA, NA, NA, NA, NA, NA, NA)
 						},error=function(e){
-						    checkresults <- c(NA, NA, NA, NA)
+						    checkresults <- c(NA, NA, NA, NA, NA, NA, NA)
 						})# tryCatch
 					}#while	
 					return <- checkresults	
@@ -80,7 +80,13 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 			#row[2] # coefficent beta2
 			#row[3] # r2
 			
-			return <- c(dailyReplication[1,], dailyReplication[2,], dailyReplication[3,], dailyReplication[4,])
+            return <- c(dailyReplication[1,], # conc
+                        dailyReplication[2,], # beta2
+                        dailyReplication[3,], # seasonal
+                        dailyReplication[4,], # r2
+                        Yhalfwin_,
+                        Shalfwin_,
+                        Qhalfwin_)
 		}#ifelse
 	})# sapply
 	# prediction is a matrix: col is daily; row is [1:replication] [1:replication] [1:replication]
@@ -94,9 +100,13 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 		beta2 = prediction[(1:replicationN)+replicationN,],
 		seasonal = prediction[(1:replicationN)+2*replicationN,],
 		r2 = prediction[(1:replicationN)+3*replicationN,],
-		NSE = nse,
-		NSEmean = mean(nse),
-		NSEsd = sd(nse))
+        Yhalfwin = prediction[4*replicationN+1],
+        Shalfwin = prediction[4*replicationN+2],
+        Qhalfwin = prediction[4*replicationN+3],
+        NSE = nse, # concentration
+        NSEmean = mean(nse), #concentration
+        NSEsd = sd(nse), #concentration
+        )
 }# function
 
  		
