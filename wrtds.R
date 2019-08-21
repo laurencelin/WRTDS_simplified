@@ -6,9 +6,12 @@ source('https://raw.githubusercontent.com/laurencelin/Date_analysis/master/LIB_m
 WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, Qhalfwin=2){ 
 	
 	prediction <- sapply(seq_len(dim(predData)[1]), function(i){
+        
+        # every day
 		if(is.na(predData$logQ[i]) ){
-			return <- rep(NA, replicationN)
+            return <- rep(NA, replicationN) # daily return
 		}else{
+            # every day we select a Yhalfwin_, Shalfwin_, and Qhalfwin_
 			Yhalfwin_ = Yhalfwin
 			Ydist = abs(obsData$ydecimal - predData$ydecimal[i])
 			Yweight = (Ydist<=Yhalfwin)*(1-(Ydist/Yhalfwin)^3)^3
@@ -100,9 +103,9 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 		beta2 = prediction[(1:replicationN)+replicationN,],
 		seasonal = prediction[(1:replicationN)+2*replicationN,],
 		r2 = prediction[(1:replicationN)+3*replicationN,],
-        Yhalfwin = prediction[4*replicationN+1],
-        Shalfwin = prediction[4*replicationN+2],
-        Qhalfwin = prediction[4*replicationN+3],
+        Yhalfwin = mean(prediction[4*replicationN+1,]),
+        Shalfwin = mean(prediction[4*replicationN+2,]),
+        Qhalfwin = meanprediction[4*replicationN+3,]),
         NSE = nse, # concentration
         NSEmean = mean(nse), #concentration
         NSEsd = sd(nse) #concentration
