@@ -105,7 +105,7 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 		r2 = prediction[(1:replicationN)+3*replicationN,],
         Yhalfwin = mean(prediction[4*replicationN+1,]),
         Shalfwin = mean(prediction[4*replicationN+2,]),
-        Qhalfwin = meanprediction[4*replicationN+3,]),
+        Qhalfwin = mean(prediction[4*replicationN+3,]),
         NSE = nse, # concentration
         NSEmean = mean(nse), #concentration
         NSEsd = sd(nse) #concentration
