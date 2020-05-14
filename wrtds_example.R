@@ -1,6 +1,4 @@
 
-source('https://raw.githubusercontent.com/laurencelin/Date_analysis/master/LIB_dailytimeseries3.R')
-source('https://raw.githubusercontent.com/laurencelin/Date_analysis/master/LIB_misc.r')
 source('https://raw.githubusercontent.com/laurencelin/WRTDS_simplified/master/wrtds.R')
 
 
@@ -15,7 +13,7 @@ source('https://raw.githubusercontent.com/laurencelin/WRTDS_simplified/master/wr
 	## make sure it has columns : year, month, and day.  you can make these easily on excel
 	w = read.csv(paste('waterChem_',site[5],'.csv',sep=''))
 	w$date = as.Date(paste(w[,'day'], w[,'month'], w[,'year'],sep="-"),format="%d-%m-%Y");
-	w$goodEntryCond = sapply(w$no3,can.be.numeric) ## <<---- use [NO3] here;
+	w$goodEntryCond = sapply(w$no3,can.be.numeric) ## <<---- NO3 mg/L
 	w$targetChem = rep(NA,dim(w)[1])
 		w$targetChem[w$goodEntryCond] = as.numeric(w$no3[w$goodEntryCond])
 		w$goodEntryCond = !is.na(w$targetChem) & w$targetChem >0 # has to be larger than zero for log transformation
@@ -35,33 +33,26 @@ source('https://raw.githubusercontent.com/laurencelin/WRTDS_simplified/master/wr
 	usgs.dtsMatch = match(commonDates, usgs$date)
 	
 	## combine chemistry and flow data together to form "obsData" to build the WRTDS model
-	obsData = data.frame(date=w$date[w.dtsMatch])
+	obsData = data.frame(date = w$date[w.dtsMatch])
 	obsData$C = w$targetChem[w.dtsMatch]
 	obsData$Q = usgs$m3ps[usgs.dtsMatch]
-	obsData$logC = log(w$targetChem[w.dtsMatch])
-	obsData$logQ = log(usgs$m3ps[usgs.dtsMatch])
-	obsData$index = seq_len(length(w.dtsMatch))
-	obsData$ydecimal = dailyTimeSeries(obsData $date)$ydecimal
-	obsData$sin2pit = sin(2*pi* obsData$ydecimal)
-	obsData$cos2pit = cos(2*pi* obsData$ydecimal)
+	
 	
 	## "predData" is the flow data as inputs to the built-model to generate predictions (concentrations)
 	## make sure it has columns : year, month, and day.  you can make these easily on excel
 	## "predData" could be the same site that used to build the model, i.e., predData = usgs(above)
 	## "predData" could be a different site with similar LULC char. and flow char.
 	targetSite = read.csv('usgs01589290.csv') # SLB tributary
+	targetSite$date = as.Date(paste(targetSite[,'day'], targetSite[,'month'], targetSite[,'year'],sep="-"),format="%d-%m-%Y"); 
 	targetSite$goodEntryCond = sapply(targetSite$siteLs,can.be.numeric)
 	targetSite$m3ps = rep(NA,dim(targetSite)[1])
 		targetSite$m3ps[targetSite$goodEntryCond] = as.numeric(targetSite$siteLs[targetSite$goodEntryCond])*0.001 # L -> m3
 		targetSite$goodEntryCond = !is.na(targetSite$m3ps) & targetSite$m3ps >0
 		
-	predData = targetSite[targetSite$goodEntryCond,]
-	predData$logQ = log(predData$m3ps) 
-	predData$date = as.Date(paste(predData[,'day'], predData[,'month'], predData[,'year'],sep="-"),format="%d-%m-%Y"); 
-	predData$ydecimal = dailyTimeSeries(predData$date)$ydecimal
-	predData$sin2pit = sin(2*pi* predData$ydecimal)
-	predData$cos2pit = cos(2*pi* predData$ydecimal)
+	predData = data.frame(date = targetSite$date[targetSite$goodEntryCond])
+	predData$Q = targetSite$m3ps[targetSite$goodEntryCond]
 
+	
 	## run the model: output is a matrix of replication	(row) X data length
 	output = WRTDS(obsData, predData)	
 	
