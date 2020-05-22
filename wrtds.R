@@ -158,17 +158,19 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 	# prediction is a list of daily list
 	# report mean daily conc and upper and lower bound
 	return <- list(
+        date = predData[,'date'],
+        
 		ConcPrediction = do.call(rbind,lapply(seq_along(prediction),function(ii){
 			return <- c(
 				mConc = mean(prediction[[ii]]$predictedConc), 
-				lConc = quantile(prediction[[ii]]$predictedConc,0.025),
-				uConc = quantile(prediction[[ii]]$predictedConc,1-0.025) )})),
+                lConc = as.numeric(quantile(prediction[[ii]]$predictedConc,0.025)),
+				uConc = as.numeric(quantile(prediction[[ii]]$predictedConc,1-0.025)) )})),
 				
 		FluxPrediction = do.call(rbind,lapply(seq_along(prediction),function(ii){
 			return <- c(
 				mFlux = mean(prediction[[ii]]$predictedFlux),
-				lFlux = quantile(prediction[[ii]]$predictedFlux,0.025),
-				uFLux = quantile(prediction[[ii]]$predictedFlux,1-0.025) )})),
+				lFlux = as.numeric(quantile(prediction[[ii]]$predictedFlux,0.025)),
+				uFLux = as.numeric(quantile(prediction[[ii]]$predictedFlux,1-0.025)) )})),
 		
 		modelParam = do.call(rbind,lapply(seq_along(prediction),function(ii){
 			return <- c(
@@ -180,7 +182,7 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 				Qhalfwin = mean(prediction[[ii]]$actualQhalfwin),
 				dailyCQr2 = mean(prediction[[ii]]$CQr2) )})),
 		
-		modelFittiness = c(concNSE, fluxNSE)			
+		modelFittiness = c(mean(concNSE), mean(fluxNSE))
 	)# end of return list 
 	
 }# function
