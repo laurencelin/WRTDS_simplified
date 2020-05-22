@@ -32,8 +32,10 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
     predData$ObsQ[pred2ObsCOND] = obsData$Q
     predData$logObsQ[pred2ObsCOND] = obsData$logQ
     
-    thresholdNUM = 120
+    thresholdNUM = 110
     
+    ## scanning model results
+    pb <- txtProgressBar(min = 0, max = dim(predData)[1], style = 3)
 	prediction <- lapply(seq_len(dim(predData)[1]), function(i){ #
         
         # i is every day
@@ -74,7 +76,7 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
                         #    # no data can be repeated more than three times
                         #    booststrap = sample(obsData$index[cond],sum(cond),replace=T)
                         #}#while
-                        booststrap = sample(obsData$index[cond],100)
+                        booststrap = sample(obsData$index[cond],size = 100)
                         result = lm(logC~ydecimal+logQ+sin2pit+cos2pit, data=obsData[booststrap,], weights= Tweight[booststrap])
                         # log(obsData$no3) = beta0 + beta1*obsData$ydecimal + beta2*obsData$logQ + beta3*obsData$sin2pit + beta4*obsData$cos2pit
                         # new features coming: visual beta2 A:: {y:Q X:time}; countour beta2 by colors
@@ -132,7 +134,8 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
                     actualYhalfwin = Yhalfwin_,
                     actualShalfwin = Shalfwin_,
                     actualQhalfwin = Qhalfwin_)
-        
+    
+        setTxtProgressBar(pb, i)
 	})# lapply - daily loop
 	# prediction is a matrix: col is daily; row is [1:replication] [1:replication] [1:replication] 1 1 1
 	# prediction is a list of daily "return list"
