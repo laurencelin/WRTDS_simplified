@@ -182,7 +182,7 @@ WRTDS = function(obsData, predData, replicationN=50, Yhalfwin=10, Shalfwin=0.5, 
 				Qhalfwin = mean(prediction[[ii]]$actualQhalfwin),
 				dailyCQr2 = mean(prediction[[ii]]$CQr2) )})),
 		
-		modelFittiness = c(mean(concNSE), mean(fluxNSE))
+		modelFitness = c(mean(concNSE), mean(fluxNSE))
 	)# end of return list 
 	
 }# function
